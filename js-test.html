@@ -1,0 +1,91 @@
+<!--
+QUESTION 4:
+
+With javascript/jquery build a table listing using the data from the customers array (stored in data.js).
+The listing should show the customer's name and age.
+Above the listing add a textbox.
+Entering a value will search all names which contains the entered string.
+When you search for a number range (20-30) it will filter the results based off the customer's age.
+E.g When you search for 20-30 it must list everyone with ages in that range.
+Please make sure your code runs as effectively as it can.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title>Test4</title>
+    <script type="text/javascript" src="jquery.js"></script>
+    <script type="text/javascript" src="data.js"></script>
+</head>
+<body>
+<h1>Search Customers</h1>
+<input type="text" id="search-input" placeholder="Search by name or age range">
+<div class="data-container"></div>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var customers = data;
+        displayCustomers(customers);
+
+        $("#search-input").on("input", function() {
+            var searchValue = $(this).val().trim();
+            var filteredCustomers = searchCustomers(customers, searchValue);
+            displayCustomers(filteredCustomers);
+        });
+    });
+
+    function displayCustomers(customers) {
+        var tableBody = $(".data-container");
+        tableBody.empty();
+
+        $.each(customers, function(index, customer) {
+            var row = $("<div>");
+            var nameCell = $("<div>").text(customer.name);
+            var ageCell = $("<div>").text(calculateAge(customer.birthdate));
+            row.append(nameCell, ageCell);
+            tableBody.append(row);
+        });
+    }
+
+    function searchCustomers(customers, searchValue) {
+        var filteredCustomers = [];
+
+        $.each(customers, function(index, customer) {
+            var customerName = customer.name.toLowerCase();
+            var customerAge = calculateAge(customer.birthdate);
+
+            if (customerName.includes(searchValue.toLowerCase()) || isAgeInRange(customerAge, searchValue)) {
+                filteredCustomers.push(customer);
+            }
+        });
+
+        return filteredCustomers;
+    }
+
+    function calculateAge(birthdate) {
+        var today = new Date();
+        var birthDate = new Date(birthdate);
+        var age = today.getFullYear() - birthDate.getFullYear();
+        var monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    }
+
+    function isAgeInRange(age, searchValue) {
+        if (searchValue.includes("-")) {
+            var range = searchValue.split("-");
+            var minAge = parseInt(range[0]);
+            var maxAge = parseInt(range[1]);
+            return age >= minAge && age <= maxAge;
+        }
+        return false;
+    }
+</script>
+</body>
+</html>
+
+
+
+
+
