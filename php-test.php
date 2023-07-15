@@ -28,48 +28,49 @@ require_once('db.php');
 <h1>Top Customers per Month</h1>
 
 <?php
-
-echo "<table>";
-
+$tableHTML = "<table>";
 $currentMonth = null;
 $currentCustomer = null;
 
-while ($row = $result->fetch_assoc()) {
+foreach ($result as $row) {
     $customer = $row['first_name'] . " " . $row['last_name'];
-    $productsBought = explode("\r\n", $row['Products_Bought']); // Split the products by newline character
+    $productsBought = explode("<br>", $row['Products_Bought']);
     $total = $row['Total'];
     $month = $row['Month'];
 
     // Display the month header
     if ($month != $currentMonth) {
-        echo "<tr style='text-align: left'><th colspan='3''><h2>$month</h2></th></tr>";
-        echo "<tr style='text-align: left'><th>Customer</th><th>Products Bought</th><th>Total</th></tr>";
+        $tableHTML .= "<tr style='text-align: left'><th colspan='3'><h2>$month</h2></th></tr>";
+        $tableHTML .= "<tr style='text-align: left'><th>Customer</th><th>Products Bought</th><th>Total</th></tr>";
         $currentMonth = $month;
         $currentCustomer = null;
     }
 
     // Display the customer details
-    echo "<tr>";
+    $tableHTML .= "<tr>";
     // Check if customer has changed
     if ($customer != $currentCustomer) {
-        echo "<td rowspan='".count($productsBought)."'>$customer</td>"; // Set rowspan for first row of customer
+        $tableHTML .= "<td rowspan='" . count($productsBought) . "'>$customer</td>";
         $currentCustomer = $customer;
     } else {
-        echo "<td></td>"; // Empty cell for duplicate customer
+        $tableHTML .= "<td></td>"; // Empty cell for duplicate customer
     }
+
     // Display products bought
     foreach ($productsBought as $index => $product) {
         if ($index > 0) {
-            echo "<tr>"; // Start new row for each additional product
+            $tableHTML .= "<tr>";
         }
-        echo "<td>$product</td>";
+        $tableHTML .= "<td>$product</td>";
         if ($index == 0) {
-            echo "<td rowspan='".count($productsBought)."'>R $total</td>"; // Set rowspan for first row of products
+            $tableHTML .= "<td rowspan='" . count($productsBought) . "'>R $total</td>";
         }
-        echo "</tr>";
+        $tableHTML .= "</tr>";
     }
 }
-echo "</table>";
+
+$tableHTML .= "</table>";
+echo $tableHTML;
 
 ?>
 
