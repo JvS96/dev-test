@@ -28,49 +28,68 @@ require_once('db.php');
 <h1>Top Customers per Month</h1>
 
 <?php
-$tableHTML = "<table>";
-$currentMonth = null;
-$currentCustomer = null;
+$monthlyCustomers = array(); // Array to store customers for each month
 
-foreach ($result as $row) {
+// Iterate over the query results and populate the $monthlyCustomers array
+while ($row = $result->fetch_assoc()) {
     $customer = $row['first_name'] . " " . $row['last_name'];
     $productsBought = explode("<br>", $row['Products_Bought']);
     $total = $row['Total'];
     $month = $row['Month'];
 
-    // Display the month header
-    if ($month != $currentMonth) {
-        $tableHTML .= "<tr style='text-align: left'><th colspan='3'><h2>$month</h2></th></tr>";
-        $tableHTML .= "<tr style='text-align: left'><th>Customer</th><th>Products Bought</th><th>Total</th></tr>";
-        $currentMonth = $month;
-        $currentCustomer = null;
+    // Create a new customer entry for the month if it doesn't exist
+    if (!isset($monthlyCustomers[$month])) {
+        $monthlyCustomers[$month] = array();
     }
 
-    // Display the customer details
-    $tableHTML .= "<tr>";
-    // Check if customer has changed
-    if ($customer != $currentCustomer) {
-        $tableHTML .= "<td rowspan='" . count($productsBought) . "'>$customer</td>";
-        $currentCustomer = $customer;
-    } else {
-        $tableHTML .= "<td></td>"; // Empty cell for duplicate customer
-    }
+    // Add the customer and their products bought to the respective month's entry
+    $monthlyCustomers[$month][] = array(
+        'customer' => $customer,
+        'products' => $productsBought,
+        'total' => $total
+    );
+}
 
-    // Display products bought
-    foreach ($productsBought as $index => $product) {
-        if ($index > 0) {
-            $tableHTML .= "<tr>";
+// Sort the customers in each month's entry based on their total spending
+foreach ($monthlyCustomers as $month => &$customers) {
+    usort($customers, function ($a, $b) {
+        return $b['total'] - $a['total'];
+    });
+}
+
+// Display the sorted customers for each month
+echo "<table>";
+
+foreach ($monthlyCustomers as $month => $customers) {
+    echo "<tr style='text-align: left'><th colspan='3'><h2>$month</h2></th></tr>";
+    echo "<tr style='text-align: left'><th>Customer</th><th>Products Bought</th><th>Total</th></tr>";
+
+    foreach ($customers as $customer) {
+        $customerName = $customer['customer'];
+        $productsBought = $customer['products'];
+        $customerTotal = $customer['total'];
+
+        echo "<tr>";
+        echo "<td>$customerName</td>";
+
+        // Display products bought
+        echo "<td>";
+        foreach ($productsBought as $index => $product) {
+            echo $product;
+            if ($index < count($productsBought) - 1) {
+                echo "<br>"; // Add line break between products
+            }
         }
-        $tableHTML .= "<td>$product</td>";
-        if ($index == 0) {
-            $tableHTML .= "<td rowspan='" . count($productsBought) . "'>R $total</td>";
-        }
-        $tableHTML .= "</tr>";
+        echo "</td>";
+
+        echo "<td>R $customerTotal</td>";
+        echo "</tr>";
     }
 }
 
-$tableHTML .= "</table>";
-echo $tableHTML;
+echo "</table>";
+
+
 
 ?>
 
