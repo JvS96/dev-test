@@ -89,8 +89,6 @@ foreach ($monthlyCustomers as $month => $customers) {
 
 echo "</table>";
 
-
-
 ?>
 
 
