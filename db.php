@@ -7,7 +7,7 @@ if (mysqli_connect_errno())
 }
 
 #Query Section
-$table_joins = "SELECT users.first_name, users.last_name, GROUP_CONCAT(products.product SEPARATOR '<br>') AS Products_Bought, SUM(products.price) AS Total, DATE_FORMAT(orders.order_date, '%M %Y') AS Month
+$customerData = "SELECT users.first_name, users.last_name, GROUP_CONCAT(products.product SEPARATOR '<br>') AS Products_Bought, SUM(products.price) AS Total, DATE_FORMAT(orders.order_date, '%M %Y') AS Month
         FROM orders
         INNER JOIN users ON orders.user_id = users.id
         INNER JOIN order_items ON orders.id = order_items.order_id
@@ -17,4 +17,4 @@ $table_joins = "SELECT users.first_name, users.last_name, GROUP_CONCAT(products.
         GROUP BY orders.id, users.first_name, users.last_name, Month
         ORDER BY orders.order_date ASC";
 
-$result = $con->query($table_joins);
+$result = $con->query($customerData);

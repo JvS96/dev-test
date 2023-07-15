@@ -22,7 +22,7 @@ require_once('db.php');
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Test3</title>
+    <title>Test3</title>
 </head>
 <body>
 <h1>Top Customers per Month</h1>
@@ -90,7 +90,5 @@ foreach ($monthlyCustomers as $month => $customers) {
 echo "</table>";
 
 ?>
-
-
 </body>
 </html>
