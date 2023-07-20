@@ -18,3 +18,25 @@ $customerData = "SELECT users.first_name, users.last_name, GROUP_CONCAT(products
         ORDER BY orders.order_date ASC";
 
 $result = $con->query($customerData);
+
+// Array to store customers for each month
+$monthlyCustomers = array();
+
+while ($row = $result->fetch_assoc()) {
+    $customer = $row['first_name'] . " " . $row['last_name'];
+    $productsBought = explode("<br>", $row['Products_Bought']);
+    $total = $row['Total'];
+    $month = $row['Month'];
+
+    // Create a new customer entry for the month if it doesn't exist
+    if (!isset($monthlyCustomers[$month])) {
+        $monthlyCustomers[$month] = array();
+    }
+
+    // Add the customer and their products bought to the respective month's entry
+    $monthlyCustomers[$month][] = array(
+        'customer' => $customer,
+        'products' => $productsBought,
+        'total' => $total
+    );
+}

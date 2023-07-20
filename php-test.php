@@ -28,29 +28,9 @@ require_once('db.php');
 <h1>Top Customers per Month</h1>
 
 <?php
-$monthlyCustomers = array(); // Array to store customers for each month
 
 // Iterate over the query results and populate the $monthlyCustomers array
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $customer = $row['first_name'] . " " . $row['last_name'];
-        $productsBought = explode("<br>", $row['Products_Bought']);
-        $total = $row['Total'];
-        $month = $row['Month'];
-
-        // Create a new customer entry for the month if it doesn't exist
-        if (!isset($monthlyCustomers[$month])) {
-            $monthlyCustomers[$month] = array();
-        }
-
-        // Add the customer and their products bought to the respective month's entry
-        $monthlyCustomers[$month][] = array(
-            'customer' => $customer,
-            'products' => $productsBought,
-            'total' => $total
-        );
-    }
-
+if ($monthlyCustomers) {
 // Sort the customers in each month's entry based on their total spending
     foreach ($monthlyCustomers as $month => &$customers) {
         usort($customers, function ($a, $b) {
@@ -60,7 +40,6 @@ if ($result->num_rows > 0) {
 
 // Display the sorted customers for each month
     echo "<table>";
-
     foreach ($monthlyCustomers as $month => $customers) {
         echo "<tr style='text-align: left'><th colspan='3'><h2>$month</h2></th></tr>";
         echo "<tr style='text-align: left'><th>Customer</th><th>Products Bought</th><th>Total</th></tr>";
